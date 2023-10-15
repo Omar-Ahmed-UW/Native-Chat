@@ -19,7 +19,7 @@ import {
 import {StreamChat} from 'stream-chat';
 import {chatApiKey, chatUserId} from './configs/chatConfig';
 import {
-  fecthTranslatedMessage,
+  // fetchTranslatedMessage,
   translateAndStoreMessage,
 } from './src/services/messageService';
 const Stack = createStackNavigator();
@@ -48,46 +48,26 @@ const ChannelListScreen = props => {
   );
 };
 
-const ChatComponent = () => {
+const ChatComponent = props => {
   const {channel} = useAppContext();
-  const doSendMessageRequest = async (channelId, message) => {
+  const doSendMessageRequest = (channelId, message) => {
     try {
       // Send the message to your backend for translation and storage
-      await translateAndStoreMessage(message.text, channelId);
+      const translatedMessage = translateAndStoreMessage(message);
 
       // Send the message using Stream.io SDK
-      return channel.sendMessage(message);
+      return channel.sendMessage(translatedMessage);
     } catch (error) {
       console.error('Error sending message:', error);
       throw error; // Propagate the error so Stream SDK can handle it
     }
   };
   return (
-    <Chat>
-      <Channel
-        channel={channel}
-        doSendMessageRequest={doSendMessageRequest}
-        Message={TranslatedMessage}>
-        <MessageList />
-        <CustomMessageInput />
-      </Channel>
-    </Chat>
+    <Channel channel={channel} doSendMessageRequest={doSendMessageRequest}>
+      <MessageList />
+      <MessageInput />
+    </Channel>
   );
-};
-
-const CustomMessageInput = props => {
-  const sendMessage = async message => {
-    try {
-      // Send the message using Stream.io SDK
-      await props.sendMessage(message);
-      // Send the message for translation and storage
-      useTranslateMessage(message);
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
-  };
-
-  return <MessageInput {...props} sendMessage={sendMessage} />;
 };
 
 const ChannelScreen = props => {
@@ -106,6 +86,21 @@ const ChannelScreen = props => {
       <MessageInput />
     </Channel>
   );
+};
+
+const CustomMessageInput = props => {
+  const sendMessage = async message => {
+    try {
+      // Send the message using Stream.io SDK
+      await props.sendMessage(message);
+      // Send the message for translation and storage
+      useTranslateMessage(message);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+
+  return <MessageInput {...props} sendMessage={sendMessage} />;
 };
 
 const ThreadScreen = props => {

@@ -9,15 +9,27 @@ export const fetchTranslatedMessage = async messageId => {
   }
 };
 
-export const translateAndStoreMessage = async message => {
+export const translateAndStoreMessage = message => {
   try {
-    const response = await fetch('/api/translate', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(message),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to translate and store message');
+    console.log('Translating and storing message:', message);
+    const response = fetch(
+      'http://localhost:3000/api/translate/translateMessage',
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({message}),
+      },
+    );
+    if (!response.staus == 200) {
+      console.error('Error translating/storing message:', response);
+      return message;
+    } else {
+      console.log('Returned body:', response);
+      return response;
     }
   } catch (error) {
     console.error('Error translating/storing message:', error);
