@@ -28,7 +28,7 @@ export const translateAndStoreMessage = message => {
       console.error('Error translating/storing message:', response);
       return message;
     } else {
-      console.log('Returned body:', response);
+      console.log('Returned body:', response.body);
       return response;
     }
   } catch (error) {
